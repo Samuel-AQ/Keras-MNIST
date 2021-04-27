@@ -41,7 +41,7 @@ model.compile(loss='categorical_crossentropy',
 training_data = model.fit(x_train,
                           y_train,
                           batch_size=100,
-                          epochs=40,
+                          epochs=200,
                           validation_split=0.2)
 
 #%% Test accuracy
