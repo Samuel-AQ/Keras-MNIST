@@ -1,20 +1,23 @@
+#%% Imports
 from keras import layers
 from keras import models
 from keras.datasets import mnist
 from keras.utils import to_categorical
+import matplotlib.pyplot as plt
 
 #%% Data
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
+
 train_images = train_images.reshape((60000, 28, 28, 1))
-train_images = train_images.astype('float32') / 255
 test_images = test_images.reshape((10000, 28, 28, 1))
+
+train_images = train_images.astype('float32') / 255
 test_images = test_images.astype('float32') / 255
+
 train_labels = to_categorical(train_labels)
 test_labels = to_categorical(test_labels)
 
 #%% Model
-# stride: number of steps per kernel
-# padding: number of zeros surrounding the image
 model = models.Sequential()
 
 kernels = [32, 64]
@@ -41,10 +44,26 @@ model.summary()
 model.compile(loss='categorical_crossentropy',
               optimizer='sgd',
               metrics=['accuracy'])
-model.fit(train_images, train_labels,
+training_data = model.fit(train_images, train_labels,
           batch_size=100,
-          epochs=5,
-          verbose=1)
+          epochs=10,
+          verbose=1,
+          validation_split=0.2)
+
+#%% Results
+plt.xlabel("Epochs")
+plt.ylabel("Accuracy")
+plt.plot(training_data.history['accuracy'])
+plt.plot(training_data.history['val_accuracy'])
+plt.legend(['Train', 'Validation'], loc = 'upper left')
+plt.show()
+
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.plot(training_data.history['loss'])
+plt.plot(training_data.history['val_loss'])
+plt.legend(['Train', 'Validation'], loc = 'upper left')
+plt.show()
 
 test_loss, test_acc = model.evaluate(test_images, test_labels)
 print('Test accuracy:', test_acc)

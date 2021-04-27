@@ -1,20 +1,15 @@
 #%% Imports
 import numpy as np
-import matplotlib.pyplot as plt
 from keras.datasets import mnist
 from keras.utils import to_categorical
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation
+import matplotlib.pyplot as plt
 
-#%% Data load
+#%% Data loading
 # Train and test set
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
-#%% Show Data
-# Shows a 6 sample
-plt.imshow(x_train[9], cmap=plt.cm.binary)
-# Show the label of the image
-print(y_train[9])
 
 #%% Data normalization
 # Transform the data into float32
@@ -43,14 +38,32 @@ model.compile(loss='categorical_crossentropy',
               optimizer = 'sgd', # stocastic gradient descent
               metrics = ['accuracy'])
 
-model.fit(x_train, y_train, batch_size=100, epochs=40)
+training_data = model.fit(x_train,
+                          y_train,
+                          batch_size=100,
+                          epochs=40,
+                          validation_split=0.2)
 
-#%% Validation
+#%% Test accuracy
+plt.xlabel("Epochs")
+plt.ylabel("Accuracy")
+plt.plot(training_data.history['accuracy'])
+plt.plot(training_data.history['val_accuracy'])
+plt.legend(['Train', 'Validation'], loc = 'upper left')
+plt.show()
+
+plt.xlabel("Epochs")
+plt.ylabel("Loss")
+plt.plot(training_data.history['loss'])
+plt.plot(training_data.history['val_loss'])
+plt.legend(['Train', 'Validation'], loc = 'upper left')
+plt.show()
+
 test_loss, test_acc = model.evaluate(x_test, y_test)
 print('Test accuracy:', test_acc)
 
-# Prediction
+print("Real label of the number: ", np.argmax(y_test[7]))
 predictions = model.predict(x_test)
-print(np.argmax(predictions[9])) # Print the index of the greater value
+print("Predicted label by the model: ", np.argmax(predictions[7]))
 
 
